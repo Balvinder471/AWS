@@ -1,0 +1,34 @@
+- name : Configuring web servers 
+  hosts : tag_name_web
+  roles :
+    - webserver
+
+
+- name : Configuring Load Balancer
+  hosts : tag_name_lb
+
+  tasks :
+    - name : Installing haproxy
+      package : 
+        name : haproxy
+        state : present      
+
+    - name : Sending conf file
+      template :
+        src : "haproxy.cfg.j2"
+        dest : /etc/haproxy/haproxy.cfg
+      notify : restart
+
+    - name : Start the service
+      service :
+        name : haproxy
+        state : started
+
+  handlers :
+    - name : restart
+      service :
+        name : haproxy
+        state : restarted
+
+
+
